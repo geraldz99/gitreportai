@@ -6,7 +6,7 @@
 Before getting started with gitreportai, ensure your runtime environment meets the following requirements:
 
 - **Programming Language:** TypeScript
-- **Package Manager:** Npm
+- **Package Manager:** Pnpm
 
 
 ###  Installation
