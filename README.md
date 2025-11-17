@@ -41,3 +41,13 @@ Run gitreportai using the following command:
 ```sh
 ❯ pnpm run dev
 ```
+
+###  ENV
+```sh
+NEXT_PUBLIC_GITHUB_ID=""
+NEXT_PUBLIC_GITHUB_SECRET=""
+NEXT_PUBLIC_NEXTAUTH_SECRET=!s4n94t124ha51a
+NEXT_PUBLIC_NEXTAUTH_URL=http://localhost:3000/api/auth/callback/github
+NEXT_PUBLIC_GROQ_API_KEY= ""
+```
+
