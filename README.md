@@ -39,5 +39,5 @@ Run gitreportai using the following command:
 **Using `pnpm`** &nbsp; [<img align="center" src="https://img.shields.io/badge/pnpm-CB3837.svg?style={badge_style}&logo=npm&logoColor=white" />](https://pnpm.io/installation)
 
 ```sh
-❯ pnpm start
+❯ pnpm run dev
 ```
