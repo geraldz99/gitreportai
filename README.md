@@ -51,3 +51,5 @@ NEXT_PUBLIC_NEXTAUTH_URL=http://localhost:3000/api/auth/callback/github
 NEXT_PUBLIC_GROQ_API_KEY= ""
 ```
 
+Customize Github ID and Github Secret as well as groq api
+
