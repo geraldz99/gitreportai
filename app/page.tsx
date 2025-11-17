@@ -32,6 +32,8 @@ const Projects = () => {
   const [objRep, setObjRep] = useState([]);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDatas, setDatas] = useState<string | null>(null);
+  const [isPopup, setPopup] = useState(false);
 
   useEffect(() => {
     const loadToken = async () => {
@@ -95,6 +97,8 @@ const Projects = () => {
     try {
       if (!project?.url || !tokenGit) return;
 
+      setIsLoading(true);
+
       const res = await fetch(project.url + "/commits", {
         headers: {
           Authorization: `Bearer ${tokenGit}`,
@@ -115,50 +119,72 @@ const Projects = () => {
       });
 
       const summary = await restCommit.json();
-      // console.log(await restCommit.json());
+      let fixSumary = [];
+
+      if (summary.files && summary.files.length > 5) {
+        fixSumary = summary.files.slice(0, 10);
+      } else {
+        fixSumary = summary.files;
+      }
+
+      console.log(fixSumary);
+
 
       const response = await fetch("https://api.groq.com/openai/v1/responses", {
         method: "POST",
         headers: {
-          Authorization: `Bearer {process.env.NEXT_PUBLIC_GROQ_API_KEY}`,
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_GROQ_API_KEY}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           model: "openai/gpt-oss-120b",
           input: `Jelaskan commit berikut singkat saja dalam bahasa indonesia tanpa ada bahasa inggris untuk report harian serta tidak usah ada dampak: \n\n${JSON.stringify(
-            summary
+            fixSumary
           )}`,
         }),
       });
 
       const value = await response.json();
-      console.log(value.output?.[1]?.content[0].text);
-      <Popup />;
+      setPopup(true);
+      setDatas(value.output?.[1]?.content[0].text);
+
+      if (response) {
+        setIsLoading(false);
+      }
     } catch (err) {
       console.error("Fetch repos gagal:", err);
     }
   };
 
-  if (isLoading) {
-    return <Loading />;
-  }
+  // if (isLoading) {
+  //   return <Loading />;
+  // }
+
+  // if(isPopup) {
+  //   return <Popup />
+  // }
 
   const projects = objRep as Repo[];
 
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
+      {isLoading && <Loading />}
+      {isPopup && isDatas ? (
+        <Popup text={isDatas} onClose={() => setPopup(false)} />
+      ) : null}
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <div className="flex ">
+          <div className="flex">
             <img
               className="w-18 h-18 rounded-full mx-4 shadow-lg"
               src={profileGit?.avatar_url}
-              alt="GitHub Logo"
+              alt="GitHub Avatar"
             />
+
             <div>
               <h1 className="text-4xl font-bold text-black mb-2">
-                Wellcom, {profileGit?.name}
+                Welcome, {profileGit?.name}
               </h1>
               <p className="text-black">
                 Manage and monitor your GitHub repositories
@@ -179,33 +205,40 @@ const Projects = () => {
                     <GitBranch className="h-5 w-5 text-accent" />
                     <CardTitle className="text-xl">{project.name}</CardTitle>
                   </div>
+
                   <Badge variant="secondary" className="text-xs">
                     {project.visibility}
                   </Badge>
                 </div>
+
                 <CardDescription className="text-base mt-2">
                   {project.description ?? "-"}
                 </CardDescription>
               </CardHeader>
+
               <CardContent>
                 <div className="flex items-center gap-6 text-sm text-muted-foreground">
                   <div className="flex items-center gap-1">
                     <span className="w-3 h-3 rounded-full bg-accent"></span>
                     <span>{project.language ?? "-"}</span>
                   </div>
+
                   <div className="flex items-center gap-1">
                     <Star className="h-4 w-4" />
                     <span>{project.stargazers_count ?? "-"}</span>
                   </div>
+
                   <div className="flex items-center gap-1">
                     <GitFork className="h-4 w-4" />
                     <span>{project.forks ?? "-"}</span>
                   </div>
+
                   <div className="flex items-center gap-1">
                     <Clock className="h-4 w-4" />
                     <span>{project.created_at ?? "-"}</span>
                   </div>
                 </div>
+
                 <Button
                   onClick={() => handleReport(project)}
                   className="w-full mt-5 cursor-pointer bg-white hover:bg-slate-100 disabled:bg-slate-600 text-slate-900 font-semibold py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 hover:shadow-lg disabled:cursor-not-allowed"
